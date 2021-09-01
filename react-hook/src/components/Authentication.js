@@ -1,11 +1,14 @@
 import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import axios from "axios";
+import useFetch from "./parts/useFetch"
 
 const Authentication = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [{response, isLoading, error}, doFetch] = useFetch("/users/login");
+
+    console.log("test", response, isLoading, error);
 
     const handleChangePassword = (e) => {
         setEmail(e.target.value)
@@ -16,32 +19,17 @@ const Authentication = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log("data", email, password)
-        setIsSubmitting(true)
+        doFetch({
+            method: 'post',
+                body: {
+            user: {
+                email: 'qq@qq.com',
+                    password: '123'
+            }
+        }})
     }
 
-    useEffect(() => {
-        if (!isSubmitting){
-            return;
-        }
-        console.log("Effect start")
-        axios('https://conduit.productionready.io/api/users/login', {
-            method: 'post',
-            body: {
-                user: {
-                    email: 'qq@qq.com',
-                    password: '123'
-                }
-            }
-        })
-            .then(res => {
-                console.log('res', res)
-                setIsSubmitting(false)
-            })
-            .catch(error => {
-                console.log('error', error)
-                setIsSubmitting(false)
-            })
-    })
+
 
     return(
         <div className={"auth-page"}>
@@ -71,7 +59,7 @@ const Authentication = () => {
                                         value={password}
                                         onChange={handleChangeEmail}/>
                                 </fieldset>
-                                <button disabled={isSubmitting} className={"btn btn-primary btn-lg pull-xs-right"} type={"submit"}>Sign in</button>
+                                <button disabled={isLoading} className={"btn btn-primary btn-lg pull-xs-right"} type={"submit"}>Sign in</button>
                             </fieldset>
                         </form>
                     </div>
