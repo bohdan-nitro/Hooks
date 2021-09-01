@@ -10,6 +10,7 @@ export default () => {
             <Route path={"/"} component={GlobalFeed} exact/>
             <Route path={"/article:slug"} component={Article} />
             <Route path={"/login"} component={Authentication}/>
+            <Route path={"/register"} component={Authentication}/>
         </Switch>
     )
 }

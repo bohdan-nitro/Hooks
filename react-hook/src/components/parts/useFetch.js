@@ -20,14 +20,14 @@ export default url => {
         axios(baseUrl + url, options)
             .then(res => {
                 console.log('res', res)
+                setResponse(res.data)
                 setIsLoading(false)
                 //Все ответы приходят в res.data
-                setResponse(res.data)
             })
             .catch(error => {
                 console.log('error', error)
-                setIsLoading(false)
                 setError(error.response.data)
+                setIsLoading(false)
             })
     }, [isLoading])
 
