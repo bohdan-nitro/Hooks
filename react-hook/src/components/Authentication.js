@@ -1,19 +1,28 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useContext} from "react";
 import {Link, Redirect} from "react-router-dom";
-import axios from "axios";
-import useFetch from "./parts/useFetch"
+import useFetch from "./parts/useFetch";
+import useLocalStorage from "./parts/useLocalStorage";
+import {CurrentUserContext} from "../contexts/CurrentUser";
 
 const Authentication = (props) => {
+    //Logic
     const isLogin = props.match.path === "/login";
     const pageTitle = isLogin ? "Sign in" : "Sign up";
     const descriptionLink = isLogin ? "/register" : "/login";
     const descriptionText = isLogin ? "Need an account" : "Have an account";
     const apiUrl = isLogin ? "/users/login" : "/users";
+
+
+    //States
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [username, setUserName] = useState("");
     const [isSuccessfullSubmit, setIsSuccessfullSubmit] = useState(false);
-    const [{response, isLoading, error}, doFetch] = useFetch(apiUrl);
+    const [{response, isLoading}, doFetch] = useFetch(apiUrl);
+    const [token, setToken] = useLocalStorage("token");
+    const [currentUserState, setCurrentUserState] = useContext(CurrentUserContext);
+
+    console.log("currentUserState", currentUserState)
 
     const handleChangePassword = (e) => {
         setEmail(e.target.value)
@@ -42,10 +51,16 @@ const Authentication = (props) => {
         if (!response){
             return
         }
-        localStorage.setItem("token", response.user.token)
+        setToken(response.user.token)
         console.log("response", response)
         setIsSuccessfullSubmit(true)
-    }, [response])
+        setCurrentUserState(state => ({
+            ...state,
+            isLoading: false,
+            isLoggedIn: true,
+            currentUser: response.user
+        }))
+    }, [response, setToken])
 
     if (isSuccessfullSubmit){
        return  <Redirect to={"/"} />
@@ -57,7 +72,7 @@ const Authentication = (props) => {
                     <div className="col-md-6 offset-md-3 col-xs-12">
                         <h1 className="text-xs-center">{pageTitle}</h1>
                         <p className="text-xs-center">
-                            <Link to="register">{descriptionText}</Link>
+                            <Link to={descriptionLink}>{descriptionText}</Link>
                         </p>
                         <form action="" onSubmit={handleSubmit}>
                             {!isLogin && (

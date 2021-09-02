@@ -4,7 +4,7 @@ import GlobalFeed from "../GlobalFeed";
 import Article from "../Articles";
 import Authentication from "../Authentication";
 
-export default () => {
+export default() => {
     return (
         <Switch>
             <Route path={"/"} component={GlobalFeed} exact/>
