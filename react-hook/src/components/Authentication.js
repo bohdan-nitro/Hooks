@@ -3,6 +3,7 @@ import {Link, Redirect} from "react-router-dom";
 import useFetch from "./parts/useFetch";
 import useLocalStorage from "./parts/useLocalStorage";
 import {CurrentUserContext} from "../contexts/CurrentUser";
+import BackendMessages from "./BackendMessages";
 
 const Authentication = (props) => {
     //Logic
@@ -18,8 +19,8 @@ const Authentication = (props) => {
     const [password, setPassword] = useState("");
     const [username, setUserName] = useState("");
     const [isSuccessfullSubmit, setIsSuccessfullSubmit] = useState(false);
-    const [{response, isLoading}, doFetch] = useFetch(apiUrl);
-    const [token, setToken] = useLocalStorage("token");
+    const [{response, isLoading, error}, doFetch] = useFetch(apiUrl);
+    const [, setToken] = useLocalStorage("token");
     const [currentUserState, setCurrentUserState] = useContext(CurrentUserContext);
 
     console.log("currentUserState", currentUserState)
@@ -60,7 +61,7 @@ const Authentication = (props) => {
             isLoggedIn: true,
             currentUser: response.user
         }))
-    }, [response, setToken])
+    }, [response, setToken, setCurrentUserState])
 
     if (isSuccessfullSubmit){
        return  <Redirect to={"/"} />
@@ -74,6 +75,7 @@ const Authentication = (props) => {
                         <p className="text-xs-center">
                             <Link to={descriptionLink}>{descriptionText}</Link>
                         </p>
+                        {error && <BackendMessages backendErrorMessage={error.errors}/>}
                         <form action="" onSubmit={handleSubmit}>
                             {!isLogin && (
                                 <fieldset className="form-group">
